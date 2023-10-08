@@ -1,0 +1,23 @@
+{
+  "name": "codespaces-blank",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "concurrently \"npm:dev\" \"npm:serve\"",
+    "dev": "tsc --watch",
+    "serve": "watch-http-server ./dist",
+    "test": "jest",
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/jest": "^29.5.5",
+    "concurrently": "^8.2.1",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.1",
+    "typescript": "^5.2.2",
+    "watch-http-server": "^0.7.6"
+  }
+}
