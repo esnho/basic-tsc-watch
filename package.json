@@ -4,9 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "concurrently \"npm:dev\" \"npm:serve\"",
-    "dev": "tsc --watch",
-    "serve": "watch-http-server ./dist",
+    "start": "concurrently -c \"auto\" \"npm:dev:*\"",
+    "dev:build": "tsc --watch",
+    "dev:serve": "watch-http-server ./dist",
     "test": "jest",
     "build": "tsc"
   },
