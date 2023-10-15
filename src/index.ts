@@ -87,6 +87,8 @@ const draw = (time: number, delta: number) => {
   // ctx.closePath();
 }
 
+const fpsTarget = document.getElementById('fps');
+
 const updateAndDraw: FrameRequestCallback = (time) => {
 
   let now = Date.now();
@@ -105,7 +107,7 @@ const updateAndDraw: FrameRequestCallback = (time) => {
 
   let sinceStart = now - startTime;
   let currentFps = Math.round(1000 / (sinceStart / ++frameCount) * 100) / 100;
-  console.log(currentFps)
+  fpsTarget.innerText = currentFps + "";
   window.requestAnimationFrame(updateAndDraw);
 }
 
