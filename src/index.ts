@@ -1,6 +1,8 @@
 import { generateGaussianNoise, noise } from "./gaussian.js";
 import { createOval } from "./ovaloide-definition.js";
-import { drawAndUpdateOvaloideGaussiano, setOvalGaussiano } from "./ovaloide-gaussiano.js";
+import { drawAndUpdateOvalNoise, setupPoints } from "./ovaloide-noise.js";
+
+// import { drawSpline } from "./spline-tools.js";
 
 const debug = false;
 
@@ -18,8 +20,7 @@ let then = Date.now();
 let startTime = then;
 let frameCount = 0;
 
-const oval = createOval(ctx);
-setOvalGaussiano(oval);
+setupPoints(ctx);
 
 const draw = (time: number, delta: number) => {
   ctx.fillStyle = "#000000";
@@ -27,16 +28,16 @@ const draw = (time: number, delta: number) => {
 
   ctx.save();
   // Create a circular clipping path
-  let clippath = new Path2D();
-  let clippath1 = new Path2D();
-  clippath1.lineTo(ctx.canvas.width * 0.5, 0);
-  drawAndUpdateOvaloideGaussiano(ctx, clippath1, delta);
-  clippath1.lineTo(ctx.canvas.width * 0.0, ctx.canvas.height * 0.);
-  let m = new DOMMatrix();
-  m = m.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
-  m = m.scale(.5)
-  clippath.addPath(clippath1, m);
-  ctx.clip(clippath);
+  let cropPath = new Path2D();
+  let cropFigure = new Path2D();
+  cropFigure.lineTo(ctx.canvas.width * 0.5, 0);
+  drawAndUpdateOvalNoise(ctx, cropFigure, delta);
+  cropFigure.lineTo(ctx.canvas.width * 0.0, ctx.canvas.height * 0.);
+  let transform = new DOMMatrix();
+  transform = transform.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
+  transform = transform.scale(.5)
+  cropPath.addPath(cropFigure, transform);
+  ctx.clip(cropPath);
 
   ctx.fillStyle = "#00FF00";
   const startOffset = (time % ((rectPadding +  rectSize))) - rectSize;
@@ -50,6 +51,11 @@ const draw = (time: number, delta: number) => {
 
   ctx.fillStyle = "#00FF00";
   ctx.fillRect(0, generateGaussianNoise(0, time * 0.1), 10, 10);
+
+
+  ctx.fillStyle = "#FF0000";
+  ctx.strokeStyle = ctx.fillStyle;
+
 
   /* if (debug) {
     ctx.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
