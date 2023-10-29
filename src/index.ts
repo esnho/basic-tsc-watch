@@ -1,8 +1,8 @@
+import { lerp } from "./utils.js";
 import { generateGaussianNoise, noise } from "./gaussian.js";
-import { createOval } from "./ovaloide-definition.js";
-import { drawAndUpdateOvalNoise, setupPoints } from "./ovaloide-noise.js";
-
-// import { drawSpline } from "./spline-tools.js";
+import { getSpline } from "./spline-tools-typed.js";
+import { getSplineUntyped, getSplineUntypedAAA } from "./spline-tools.js";
+import { drawSpline } from "./spline-tools.js";
 
 const debug = false;
 
@@ -20,27 +20,94 @@ let then = Date.now();
 let startTime = then;
 let frameCount = 0;
 
-setupPoints(ctx);
+let points = [
+  200,100,
+  100,100,
+  100,200,
+  200,200,
+  250,150,
+]
+
+let pointsTarget = points.map(v => v)
+
+const t = 0.5;
 
 const draw = (time: number, delta: number) => {
-  ctx.fillStyle = "#000000";
+  ctx.fillStyle = "#666";
   ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
   ctx.save();
   // Create a circular clipping path
   let cropPath = new Path2D();
-  let cropFigure = new Path2D();
-  cropFigure.lineTo(ctx.canvas.width * 0.5, 0);
-  drawAndUpdateOvalNoise(ctx, cropFigure, delta);
-  cropFigure.lineTo(ctx.canvas.width * 0.0, ctx.canvas.height * 0.);
+  
+
   let transform = new DOMMatrix();
-  transform = transform.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
-  transform = transform.scale(.5)
-  cropPath.addPath(cropFigure, transform);
-  ctx.clip(cropPath);
+  /* transform = transform.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
+  transform = transform.scale(.5) */
+  let ppp = [];
+  let sides = 3;
+  let incr = (Math.PI / sides * 2);
+  let radius = 500;
+  let offset = 200;
+  let noise = 0.04 + ((Math.sin(time * 0.04) + (Math.PI * 0.5)) * 0.1);
+  for (let i = 0; i < sides; i++) {
+    const distx =((Math.cos(time * 0.1 * i/sides)) + Math.PI) * noise;
+    const disty =((Math.sin(time * 0.15 * i/sides)) + Math.PI) * noise;
+    const x = (offset + Math.sin(incr * i + distx) * radius);
+    const y = (offset + Math.cos(incr * i + disty) * radius);
+    ppp.push(x, y);
+  }
+  cropPath.addPath(
+    getSpline(
+      ppp.map(v => v),
+      t,
+      true
+    ),
+    transform
+  );
+  cropPath.closePath()
+  ctx.clip(cropPath, 'nonzero');
 
   ctx.fillStyle = "#00FF00";
-  const startOffset = (time % ((rectPadding +  rectSize))) - rectSize;
+  let startOffset = ((time * 0.3) % ((rectPadding +  rectSize))) - rectSize;
+  for (let x = startOffset; x < ctx.canvas.width; x = x + rectSize + rectPadding) {
+    for (let y = startOffset; y < ctx.canvas.height; y = y + rectSize + rectPadding) {
+      ctx.fillRect(x, y, rectSize, rectSize);
+    }
+  }
+  ctx.restore();
+  cropPath = new Path2D();
+  ctx.save();
+
+  transform = new DOMMatrix();
+  /* transform = transform.translate(ctx.canvas.width * 0.5, ctx.canvas.height * 0.5);
+  transform = transform.scale(.5) */
+  ppp = [];
+  sides = 4;
+  incr = (Math.PI / sides * 2);
+  radius = 300;
+  offset = 480;
+ noise = 0.04 + ((Math.sin(time * 0.04) + (Math.PI * 0.5)) * 0.1);
+  for (let i = 0; i < sides; i++) {
+    const distx =((Math.cos(time * 0.1 * i/sides)) + Math.PI) * noise;
+    const disty =((Math.sin(time * 0.15 * i/sides)) + Math.PI) * noise;
+    const x = (offset + Math.sin(incr * i + distx) * radius);
+    const y = (offset + Math.cos(incr * i + disty) * radius);
+    ppp.push(x, y);
+  }
+  cropPath.addPath(
+    getSpline(
+      ppp.map(v => v),
+      t,
+      true
+    ),
+    transform
+  );
+  cropPath.closePath()
+  ctx.clip(cropPath, 'nonzero');
+
+  ctx.fillStyle = "#DFDFDF";
+  startOffset = ((time * 0.39) % ((rectPadding +  rectSize))) - rectSize;
   for (let x = startOffset; x < ctx.canvas.width; x = x + rectSize + rectPadding) {
     for (let y = startOffset; y < ctx.canvas.height; y = y + rectSize + rectPadding) {
       ctx.fillRect(x, y, rectSize, rectSize);
@@ -52,9 +119,14 @@ const draw = (time: number, delta: number) => {
   ctx.fillStyle = "#00FF00";
   ctx.fillRect(0, generateGaussianNoise(0, time * 0.1), 10, 10);
 
-
   ctx.fillStyle = "#FF0000";
-  ctx.strokeStyle = ctx.fillStyle;
+  ctx.strokeStyle = "#FF0000";
+  /* getSplineUntyped(
+    ctx,
+    points.map(v => v),
+    t,
+    true
+  ); */
 
 
   /* if (debug) {

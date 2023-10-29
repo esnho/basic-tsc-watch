@@ -6,8 +6,10 @@
       "noImplicitAny": true,
       "removeComments": true,
       "preserveConstEnums": true,
+      "outDir": "./dist",
+      "rootDir": "./src",
       "sourceMap": false,
-      "outDir": "dist"
+      "allowJs": true
     },
     "include": ["src/**/*"]
 }

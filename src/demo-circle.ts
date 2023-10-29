@@ -1,5 +1,7 @@
 // adapted from https://stackoverflow.com/questions/26947321/building-a-circle-with-quadratic-curves-in-canvas
 
+import { lerp } from "./utils";
+
 // change sideCount to the # of poly sides desired
 //
 const sideCount = 5;
@@ -24,8 +26,6 @@ function polarToCart(center: Point, a: number, r: number): Point {
 }
 
 // general interpolation function
-const lerp = function (a: number, b: number, x: number) { return (a + x * (b - a)); }
-
 // define the regular polygon
 const cx = 150;
 const cy = 150;
